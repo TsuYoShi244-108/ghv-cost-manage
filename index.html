@@ -18,7 +18,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -144,6 +144,71 @@
             display: block;
         }
         
+        .input-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .input-panel {
+            overflow-y: auto;
+            max-height: 800px;
+        }
+        
+        .receipt-panel {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .receipt-panel.has-receipt {
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+        
+        .receipt-preview {
+            max-width: 100%;
+            max-height: 700px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .receipt-upload {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .receipt-upload p {
+            color: #666;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .receipt-upload input[type="file"] {
+            display: none;
+        }
+        
+        .receipt-upload-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .receipt-upload-btn:hover {
+            background: #764ba2;
+        }
+        
         .section {
             margin-bottom: 30px;
         }
@@ -168,8 +233,8 @@
         
         .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
         }
         
         .form-group input,
@@ -195,35 +260,37 @@
             color: #2c3e50;
         }
         
-        .feed-item-row {
+        .feed-item-inputs {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 10px;
         }
         
-        .feed-item-row label {
-            font-size: 13px;
-            margin: 0;
-            color: #666;
+        .feed-item-inputs .form-group {
+            margin-bottom: 0;
         }
         
-        .feed-item-row input {
-            font-size: 13px;
+        .feed-item-inputs label {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        
+        .feed-item-inputs input {
             padding: 8px;
+            font-size: 13px;
         }
         
-        .checkbox-group {
+        .month-selector {
             display: flex;
-            align-items: center;
             gap: 10px;
-            margin: 15px 0;
+            margin-bottom: 20px;
         }
         
-        .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
+        .month-selector input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         
         .summary-box {
@@ -239,6 +306,7 @@
             color: #667eea;
             margin-bottom: 10px;
             border: none;
+            padding: 0;
         }
         
         .summary-box .amount {
@@ -270,24 +338,10 @@
             background: #764ba2;
         }
         
-        button.btn-secondary {
-            flex: 1;
-            padding: 12px 20px;
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        button.btn-secondary:hover {
-            background: #f0f0f0;
-        }
-        
         button.btn-logout {
+            position: fixed;
+            top: 20px;
+            right: 20px;
             background: #e74c3c;
             color: white;
             padding: 8px 15px;
@@ -295,16 +349,6 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 14px;
-        }
-        
-        button.btn-logout:hover {
-            background: #c0392b;
-        }
-        
-        .logout-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
         }
         
         .success-message {
@@ -316,51 +360,43 @@
             display: none;
         }
         
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .month-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .month-selector input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        
         .horse-cost-section {
             background: #f9f9f9;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 15px;
+            border-left: 4px solid #667eea;
         }
         
-        .horse-cost-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .horse-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             margin-bottom: 15px;
-            font-weight: bold;
         }
         
-        .horse-cost-remove {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
             cursor: pointer;
-            font-size: 12px;
+        }
+        
+        @media (max-width: 1024px) {
+            .input-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .receipt-panel {
+                min-height: 300px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -368,16 +404,14 @@
                 padding: 10px;
             }
             
-            .feed-item-row {
+            .feed-item-inputs {
                 grid-template-columns: 1fr;
-            }
-            
-            .tabs {
-                flex-wrap: wrap;
             }
             
             .tab-button {
                 flex: 1;
+                font-size: 14px;
+                padding: 10px;
             }
             
             header {
@@ -408,9 +442,7 @@
     
     <!-- メイン画面 -->
     <div id="mainScreen">
-        <div class="logout-container">
-            <button class="btn-logout" onclick="handleLogout()">ログアウト</button>
-        </div>
+        <button class="btn-logout" onclick="handleLogout()">ログアウト</button>
         
         <div class="container">
             <header>
@@ -421,7 +453,6 @@
             <div class="tabs">
                 <button class="tab-button active" onclick="switchTab('input')">💰 入力</button>
                 <button class="tab-button" onclick="switchTab('report')">📊 レポート</button>
-                <button class="tab-button" onclick="switchTab('settings')">⚙️ 設定</button>
             </div>
             
             <!-- 入力タブ -->
@@ -431,57 +462,128 @@
                 </div>
                 
                 <div class="success-message" id="successMessage">✓ データを保存しました</div>
-                <div class="error-message" id="errorMessage"></div>
                 
-                <!-- ステップ1: 全体コスト -->
-                <div class="section">
-                    <h3>📋 ステップ1: 全体コスト入力</h3>
-                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">全18頭が共有する食材・敷料費などを入力します</p>
-                    
-                    <!-- 食材費 -->
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #667eea; margin-bottom: 10px;">🌾 食材コスト</h4>
-                        <div id="feedContainer"></div>
-                    </div>
-                    
-                    <!-- 敷料費 -->
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #667eea; margin-bottom: 10px;">📦 敷料費</h4>
-                        <div class="feed-item">
-                            <div class="feed-item-header">おがくず等</div>
-                            <div class="feed-item-row">
-                                <label>単価（¥/kg）</label>
-                                <input type="number" id="bedding_price" value="0" step="0.01" />
-                                <label>数量（kg）</label>
-                                <input type="number" id="bedding_qty" value="0" step="0.01" />
+                <div class="input-layout">
+                    <!-- 左側：入力フォーム -->
+                    <div class="input-panel">
+                        <!-- ステップ1: 全体コスト -->
+                        <div class="section">
+                            <h3>📋 ステップ1: 全体コスト入力</h3>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">全18頭が共有する食材・敷料費などを入力します</p>
+                            
+                            <!-- 飼料費 -->
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">🌾 飼料費</h4>
+                                <div id="feedContainer"></div>
                             </div>
+                            
+                            <!-- 装蹄費 -->
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">👣 装蹄費</h4>
+                                <div class="feed-item">
+                                    <div class="feed-item-header">ヘイキューブ 30kg</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>単価（¥/袋）</label>
+                                            <input type="number" id="haycube_price" value="3970" step="0.01" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>数量（袋）</label>
+                                            <input type="number" id="haycube_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="feed-item">
+                                    <div class="feed-item-header">皮つき圧ぺん麦 20kg</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>単価（¥/袋）</label>
+                                            <input type="number" id="barley_price" value="1601" step="0.01" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>数量（袋）</label>
+                                            <input type="number" id="barley_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="feed-item">
+                                    <div class="feed-item-header">ハイホス 20kg</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>単価（¥/袋）</label>
+                                            <input type="number" id="high_horse_price" value="4540" step="0.01" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>数量（袋）</label>
+                                            <input type="number" id="high_horse_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 医療費 -->
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">💉 医療費</h4>
+                                <div style="color: #666; font-size: 13px; margin-bottom: 10px;">※個別の馬の医療費はステップ2で入力</div>
+                            </div>
+                            
+                            <!-- 敷料費 -->
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">📦 敷料費</h4>
+                                <div class="feed-item">
+                                    <div class="feed-item-header">おがくず等</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>単価（¥/kg）</label>
+                                            <input type="number" id="bedding_price" value="0" step="0.01" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>数量（kg）</label>
+                                            <input type="number" id="bedding_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-box">
+                                <h3>月全体コスト</h3>
+                                <div class="amount" id="commonTotal">¥0</div>
+                            </div>
+                        </div>
+                        
+                        <!-- ステップ2: 馬別追加コスト -->
+                        <div class="section">
+                            <h3>🐴 ステップ2: 馬別追加コスト</h3>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">特定の馬にかかった医療費などを入力します（オプション）</p>
+                            
+                            <div id="horseCostsContainer"></div>
+                            
+                            <button class="btn-primary" onclick="addHorseCost()" style="margin-bottom: 20px;">+ さらに別の馬を追加</button>
+                            
+                            <div class="summary-box">
+                                <h3>月全コスト</h3>
+                                <div class="amount" id="totalCost">¥0</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 保存ボタン -->
+                        <div class="buttons">
+                            <button class="btn-primary" onclick="saveMonthData()">💾 保存</button>
                         </div>
                     </div>
                     
-                    <div class="summary-box">
-                        <h3>月全体コスト</h3>
-                        <div class="amount" id="commonTotal">¥0</div>
+                    <!-- 右側：請求書プレビュー -->
+                    <div class="receipt-panel" id="receiptPanel">
+                        <div class="receipt-upload">
+                            <p>📄 請求書をアップロード</p>
+                            <p style="font-size: 12px;">（参考用：入力画面の横に表示）</p>
+                            <label class="receipt-upload-btn" onclick="document.getElementById('receiptFile').click();">
+                                ファイルを選択
+                            </label>
+                            <input type="file" id="receiptFile" accept=".pdf,.jpg,.jpeg,.png" onchange="handleReceiptUpload(event)" />
+                            <p style="font-size: 12px; margin-top: 15px;">対応形式：PDF, JPG, PNG</p>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- ステップ2: 馬別追加コスト -->
-                <div class="section">
-                    <h3>🐴 ステップ2: 馬別追加コスト</h3>
-                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">特定の馬にかかった医療費などを入力します（オプション）</p>
-                    
-                    <div id="horseCostsContainer"></div>
-                    
-                    <button class="btn-secondary" onclick="addHorseCost()" style="margin-bottom: 20px;">+ さらに別の馬を追加</button>
-                    
-                    <div class="summary-box">
-                        <h3>月全コスト（共通費 + 馬別費）</h3>
-                        <div class="amount" id="totalCost">¥0</div>
-                    </div>
-                </div>
-                
-                <!-- 保存ボタン -->
-                <div class="buttons">
-                    <button class="btn-primary" onclick="saveMonthData()">💾 保存</button>
                 </div>
             </div>
             
@@ -495,29 +597,10 @@
                 </div>
                 <div id="reportContent" style="margin-top: 20px;"></div>
             </div>
-            
-            <!-- 設定タブ -->
-            <div id="settings" class="tab-content">
-                <h3>⚙️ 設定</h3>
-                <div class="section">
-                    <h4>パスワード変更</h4>
-                    <div class="form-group">
-                        <label>新しいパスワード：</label>
-                        <input type="password" id="newPassword" />
-                    </div>
-                    <button class="btn-primary" onclick="changePassword()">パスワードを変更</button>
-                </div>
-                <div class="section">
-                    <h4>データエクスポート</h4>
-                    <button class="btn-primary" onclick="exportData()">データをダウンロード</button>
-                </div>
-            </div>
         </div>
     </div>
     
     <script>
-        // グローバル変数
-        let currentMonth = new Date();
         let feedPrices = {};
         let horseCostRows = 0;
         
@@ -583,7 +666,6 @@
                 const response = await fetch(`/api/month-data/${year}/${month}`);
                 const data = await response.json();
                 
-                // データを画面に反映
                 if (data.common_costs) {
                     populateCommonCosts(data.common_costs);
                 }
@@ -605,11 +687,15 @@
                 div.className = 'feed-item';
                 div.innerHTML = `
                     <div class="feed-item-header">${feed.name}</div>
-                    <div class="feed-item-row">
-                        <label>単価（¥/${feed.unit}）</label>
-                        <input type="number" class="feed-price" data-key="${key}" value="${feed.price}" step="0.01" onchange="updateFeedItem('${key}')" />
-                        <label>数量（${feed.unit}）</label>
-                        <input type="number" class="feed-qty" data-key="${key}" value="0" step="0.01" onchange="updateCommonTotal()" />
+                    <div class="feed-item-inputs">
+                        <div class="form-group">
+                            <label>単価（¥/${feed.unit}）</label>
+                            <input type="number" class="feed-price" data-key="${key}" value="${feed.price}" step="0.01" onchange="updateFeedItem('${key}')" />
+                        </div>
+                        <div class="form-group">
+                            <label>数量（${feed.unit}）</label>
+                            <input type="number" class="feed-qty" data-key="${key}" value="0" step="0.01" onchange="updateCommonTotal()" />
+                        </div>
                     </div>
                 `;
                 container.appendChild(div);
@@ -634,6 +720,21 @@
                 total += price * qty;
             });
             
+            // ヘイキューブ
+            const haycubePrice = parseFloat(document.getElementById('haycube_price').value) || 0;
+            const haycubeQty = parseFloat(document.getElementById('haycube_qty').value) || 0;
+            total += haycubePrice * haycubeQty;
+            
+            // 皮つき圧ぺん麦
+            const barleyPrice = parseFloat(document.getElementById('barley_price').value) || 0;
+            const barleyQty = parseFloat(document.getElementById('barley_qty').value) || 0;
+            total += barleyPrice * barleyQty;
+            
+            // ハイホス
+            const high_horsePrice = parseFloat(document.getElementById('high_horse_price').value) || 0;
+            const high_horseQty = parseFloat(document.getElementById('high_horse_qty').value) || 0;
+            total += high_horsePrice * high_horseQty;
+            
             // 敷料費
             const beddingPrice = parseFloat(document.getElementById('bedding_price').value) || 0;
             const beddingQty = parseFloat(document.getElementById('bedding_qty').value) || 0;
@@ -652,9 +753,10 @@
             div.className = 'horse-cost-section';
             div.id = `horse-cost-${horseCostRows}`;
             div.innerHTML = `
-                <div class="horse-cost-header">
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold; margin-bottom: 8px; display: block;">馬を選択</label>
                     <select class="horse-select" onchange="updateTotalCost()">
-                        <option value="">馬を選択</option>
+                        <option value="">--- 選択 ---</option>
                         <option>グートアウス</option>
                         <option>レストア</option>
                         <option>ダーク</option>
@@ -674,41 +776,41 @@
                         <option>マルコ</option>
                         <option>ユメ</option>
                     </select>
-                    <button class="horse-cost-remove" onclick="removeHorseCost(${horseCostRows})">削除</button>
                 </div>
                 
-                <h4 style="color: #667eea; margin-bottom: 10px;">💉 医療費</h4>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>ワクチン（¥）</label>
-                        <input type="number" class="vaccine-cost" value="0" onchange="updateTotalCost()" />
-                    </div>
-                    <div class="form-group">
-                        <label>装蹄（¥）</label>
-                        <input type="number" class="shoeing-cost" value="16500" onchange="updateShoeing(${horseCostRows})" />
-                    </div>
-                    <div class="form-group">
-                        <label>駆虫薬（¥）</label>
-                        <input type="number" class="worming-cost" value="0" onchange="updateTotalCost()" />
-                    </div>
+                <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">💉 医療費</h4>
+                <div class="form-group">
+                    <label>ワクチン（¥）</label>
+                    <input type="number" class="vaccine-cost" value="0" onchange="updateTotalCost()" />
                 </div>
                 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="trim-${horseCostRows}" onchange="toggleTrimming(${horseCostRows})" />
-                    <label for="trim-${horseCostRows}">削蹄のみ</label>
-                </div>
-                
-                <div id="trimming-${horseCostRows}" style="display: none;">
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold;">装蹄</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="trim-${horseCostRows}" onchange="toggleTrimming(${horseCostRows})" />
+                        <label for="trim-${horseCostRows}">削蹄のみ</label>
+                    </div>
                     <div class="form-group">
+                        <label id="shoeing-label-${horseCostRows}">装蹄（¥）</label>
+                        <input type="number" class="shoeing-cost" id="shoeing-${horseCostRows}" value="16500" onchange="updateTotalCost()" />
+                    </div>
+                    <div id="trimming-${horseCostRows}" style="display: none;" class="form-group">
                         <label>削蹄のみ（¥）</label>
                         <input type="number" class="trimming-cost" value="7000" onchange="updateTotalCost()" />
                     </div>
                 </div>
                 
                 <div class="form-group">
+                    <label>駆虫薬（¥）</label>
+                    <input type="number" class="worming-cost" value="0" onchange="updateTotalCost()" />
+                </div>
+                
+                <div class="form-group">
                     <label>その他（¥）</label>
                     <input type="number" class="other-cost" value="0" onchange="updateTotalCost()" />
                 </div>
+                
+                <button style="width: 100%; padding: 8px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;" onclick="removeHorseCost(${horseCostRows})">この馬を削除</button>
             `;
             
             container.appendChild(div);
@@ -717,24 +819,22 @@
         // 装蹄/削蹄切り替え
         function toggleTrimming(id) {
             const checkbox = document.getElementById(`trim-${id}`);
-            const shoeingInput = document.querySelector(`#horse-cost-${id} .shoeing-cost`);
+            const shoeingInput = document.getElementById(`shoeing-${id}`);
             const trimmingDiv = document.getElementById(`trimming-${id}`);
+            const shoeingLabel = document.getElementById(`shoeing-label-${id}`);
             
             if (checkbox.checked) {
                 shoeingInput.disabled = true;
                 shoeingInput.style.opacity = '0.5';
                 trimmingDiv.style.display = 'block';
+                shoeingLabel.textContent = '装蹄（使用しません）';
             } else {
                 shoeingInput.disabled = false;
                 shoeingInput.style.opacity = '1';
                 trimmingDiv.style.display = 'none';
+                shoeingLabel.textContent = '装蹄（¥）';
             }
             
-            updateTotalCost();
-        }
-        
-        // 装蹄の更新
-        function updateShoeing(id) {
             updateTotalCost();
         }
         
@@ -749,21 +849,8 @@
         
         // 全コスト更新
         function updateTotalCost() {
-            let common = 0;
+            let common = parseFloat(document.getElementById('commonTotal').textContent.replace('¥', '').replace(/,/g, '')) || 0;
             
-            // 共通費
-            document.querySelectorAll('input.feed-qty').forEach(input => {
-                const key = input.dataset.key;
-                const price = feedPrices[key].price || 0;
-                const qty = parseFloat(input.value) || 0;
-                common += price * qty;
-            });
-            
-            const beddingPrice = parseFloat(document.getElementById('bedding_price').value) || 0;
-            const beddingQty = parseFloat(document.getElementById('bedding_qty').value) || 0;
-            common += beddingPrice * beddingQty;
-            
-            // 馬別費
             let horseTotal = 0;
             document.querySelectorAll('.horse-cost-section').forEach(section => {
                 const vaccine = parseFloat(section.querySelector('.vaccine-cost').value) || 0;
@@ -795,6 +882,50 @@
             event.target.classList.add('active');
         }
         
+        // 請求書アップロード処理
+        function handleReceiptUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const panel = document.getElementById('receiptPanel');
+                panel.classList.add('has-receipt');
+                panel.innerHTML = '';
+                
+                if (file.type === 'application/pdf') {
+                    // PDF の場合はメッセージを表示
+                    panel.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <p>📄 PDF ファイルがアップロードされました</p>
+                            <p style="font-size: 12px; color: #666;">（お使いのブラウザでは PDF プレビューが制限されています）</p>
+                            <button style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;" onclick="document.getElementById('receiptFile').click();">別のファイルを選択</button>
+                        </div>
+                    `;
+                } else {
+                    // 画像の場合はプレビュー表示
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'receipt-preview';
+                    panel.innerHTML = '';
+                    panel.appendChild(img);
+                    
+                    const changeBtn = document.createElement('button');
+                    changeBtn.textContent = '別のファイルを選択';
+                    changeBtn.style.marginTop = '10px';
+                    changeBtn.style.padding = '8px 16px';
+                    changeBtn.style.background = '#667eea';
+                    changeBtn.style.color = 'white';
+                    changeBtn.style.border = 'none';
+                    changeBtn.style.borderRadius = '5px';
+                    changeBtn.style.cursor = 'pointer';
+                    changeBtn.onclick = () => document.getElementById('receiptFile').click();
+                    panel.appendChild(changeBtn);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        
         // データ保存
         async function saveMonthData() {
             const monthInput = document.getElementById('monthInput');
@@ -814,9 +945,18 @@
                 commonCosts.feed[feedName] = price * qty;
             });
             
+            commonCosts.shoeing = {
+                'ヘイキューブ 30kg': (parseFloat(document.getElementById('haycube_price').value) || 0) * 
+                                       (parseFloat(document.getElementById('haycube_qty').value) || 0),
+                '皮つき圧ぺん麦 20kg': (parseFloat(document.getElementById('barley_price').value) || 0) * 
+                                        (parseFloat(document.getElementById('barley_qty').value) || 0),
+                'ハイホス 20kg': (parseFloat(document.getElementById('high_horse_price').value) || 0) * 
+                                (parseFloat(document.getElementById('high_horse_qty').value) || 0)
+            };
+            
             commonCosts.bedding = {
                 'おがくず等': (parseFloat(document.getElementById('bedding_price').value) || 0) * 
-                              (parseFloat(document.getElementById('bedding_qty').value) || 0)
+                             (parseFloat(document.getElementById('bedding_qty').value) || 0)
             };
             
             // 馬別費の集計
@@ -859,8 +999,6 @@
                 }
             } catch (error) {
                 console.error('保存エラー:', error);
-                document.getElementById('errorMessage').textContent = '保存に失敗しました';
-                document.getElementById('errorMessage').style.display = 'block';
             }
         }
         
@@ -893,17 +1031,7 @@
             }
         }
         
-        // パスワード変更
-        function changePassword() {
-            alert('パスワード変更機能は管理者に連絡してください');
-        }
-        
-        // データエクスポート
-        function exportData() {
-            alert('データエクスポート機能は準備中です');
-        }
-        
-        // その他の関数（プレースホルダー）
+        // その他の関数
         function populateCommonCosts(data) {
             // 後で実装
         }
