@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHVコスト管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* ログイン画面 */
+        #loginScreen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-box h2 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .login-box button:hover {
+            background: #764ba2;
+        }
+        
+        .login-error {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        /* メイン画面 */
+        #mainScreen {
+            display: none;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .tab-button {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .feed-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feed-item-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .feed-item-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .feed-item-row label {
+            font-size: 13px;
+            margin: 0;
+            color: #666;
+        }
+        
+        .feed-item-row input {
+            font-size: 13px;
+            padding: 8px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .summary-box {
+            background: #e8f4f8;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .summary-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            border: none;
+        }
+        
+        .summary-box .amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        button.btn-primary {
+            flex: 1;
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button.btn-primary:hover {
+            background: #764ba2;
+        }
+        
+        button.btn-secondary {
+            flex: 1;
+            padding: 12px 20px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button.btn-secondary:hover {
+            background: #f0f0f0;
+        }
+        
+        button.btn-logout {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button.btn-logout:hover {
+            background: #c0392b;
+        }
+        
+        .logout-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .month-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .month-selector input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .horse-cost-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .horse-cost-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .horse-cost-remove {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .feed-item-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab-button {
+                flex: 1;
+            }
+            
+            header {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ログイン画面 -->
+    <div id="loginScreen">
+        <div class="login-box">
+            <h2>🐴 GHVコスト管理</h2>
+            <p>馬のコスト管理システム</p>
+            <div class="login-error" id="loginError"></div>
+            <input type="password" id="passwordInput" placeholder="パスワードを入力" />
+            <button onclick="handleLogin()">ログイン</button>
+        </div>
+    </div>
+    
+    <!-- メイン画面 -->
+    <div id="mainScreen">
+        <div class="logout-container">
+            <button class="btn-logout" onclick="handleLogout()">ログアウト</button>
+        </div>
+        
+        <div class="container">
+            <header>
+                <h1>🐴 GHVコスト管理</h1>
+                <p class="subtitle">Gocoo Horse Village コスト管理システム</p>
+            </header>
+            
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('input')">💰 入力</button>
+                <button class="tab-button" onclick="switchTab('report')">📊 レポート</button>
+                <button class="tab-button" onclick="switchTab('settings')">⚙️ 設定</button>
+            </div>
+            
+            <!-- 入力タブ -->
+            <div id="input" class="tab-content active">
+                <div class="month-selector">
+                    <input type="month" id="monthInput" />
+                </div>
+                
+                <div class="success-message" id="successMessage">✓ データを保存しました</div>
+                <div class="error-message" id="errorMessage"></div>
+                
+                <!-- ステップ1: 全体コスト -->
+                <div class="section">
+                    <h3>📋 ステップ1: 全体コスト入力</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">全18頭が共有する食材・敷料費などを入力します</p>
+                    
+                    <!-- 食材費 -->
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">🌾 食材コスト</h4>
+                        <div id="feedContainer"></div>
+                    </div>
+                    
+                    <!-- 敷料費 -->
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">📦 敷料費</h4>
+                        <div class="feed-item">
+                            <div class="feed-item-header">おがくず等</div>
+                            <div class="feed-item-row">
+                                <label>単価（¥/kg）</label>
+                                <input type="number" id="bedding_price" value="0" step="0.01" />
+                                <label>数量（kg）</label>
+                                <input type="number" id="bedding_qty" value="0" step="0.01" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-box">
+                        <h3>月全体コスト</h3>
+                        <div class="amount" id="commonTotal">¥0</div>
+                    </div>
+                </div>
+                
+                <!-- ステップ2: 馬別追加コスト -->
+                <div class="section">
+                    <h3>🐴 ステップ2: 馬別追加コスト</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">特定の馬にかかった医療費などを入力します（オプション）</p>
+                    
+                    <div id="horseCostsContainer"></div>
+                    
+                    <button class="btn-secondary" onclick="addHorseCost()" style="margin-bottom: 20px;">+ さらに別の馬を追加</button>
+                    
+                    <div class="summary-box">
+                        <h3>月全コスト（共通費 + 馬別費）</h3>
+                        <div class="amount" id="totalCost">¥0</div>
+                    </div>
+                </div>
+                
+                <!-- 保存ボタン -->
+                <div class="buttons">
+                    <button class="btn-primary" onclick="saveMonthData()">💾 保存</button>
+                </div>
+            </div>
+            
+            <!-- レポートタブ -->
+            <div id="report" class="tab-content">
+                <h3>📊 年間レポート</h3>
+                <div class="form-group">
+                    <label>年を選択：</label>
+                    <input type="number" id="reportYear" value="2026" min="2020" max="2030" />
+                    <button class="btn-primary" onclick="loadReport()" style="margin-top: 10px;">レポートを生成</button>
+                </div>
+                <div id="reportContent" style="margin-top: 20px;"></div>
+            </div>
+            
+            <!-- 設定タブ -->
+            <div id="settings" class="tab-content">
+                <h3>⚙️ 設定</h3>
+                <div class="section">
+                    <h4>パスワード変更</h4>
+                    <div class="form-group">
+                        <label>新しいパスワード：</label>
+                        <input type="password" id="newPassword" />
+                    </div>
+                    <button class="btn-primary" onclick="changePassword()">パスワードを変更</button>
+                </div>
+                <div class="section">
+                    <h4>データエクスポート</h4>
+                    <button class="btn-primary" onclick="exportData()">データをダウンロード</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // グローバル変数
+        let currentMonth = new Date();
+        let feedPrices = {};
+        let horseCostRows = 0;
+        
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            document.getElementById('monthInput').valueAsDate = new Date(today.getFullYear(), today.getMonth());
+            document.getElementById('reportYear').value = today.getFullYear();
+        });
+        
+        // ログイン処理
+        async function handleLogin() {
+            const password = document.getElementById('passwordInput').value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('mainScreen').style.display = 'block';
+                    loadMonthData();
+                    initializeFeedPrices();
+                } else {
+                    document.getElementById('loginError').textContent = 'パスワードが違います';
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('ログインエラー:', error);
+            }
+        }
+        
+        // ログアウト処理
+        function handleLogout() {
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+        
+        // 飼料単価初期化
+        async function initializeFeedPrices() {
+            try {
+                const response = await fetch('/api/feed-prices');
+                const data = await response.json();
+                feedPrices = data.prices;
+                renderFeedItems();
+            } catch (error) {
+                console.error('飼料単価取得エラー:', error);
+            }
+        }
+        
+        // 月データ読み込み
+        async function loadMonthData() {
+            const monthInput = document.getElementById('monthInput');
+            const year = monthInput.valueAsDate.getFullYear();
+            const month = String(monthInput.valueAsDate.getMonth() + 1).padStart(2, '0');
+            
+            try {
+                const response = await fetch(`/api/month-data/${year}/${month}`);
+                const data = await response.json();
+                
+                // データを画面に反映
+                if (data.common_costs) {
+                    populateCommonCosts(data.common_costs);
+                }
+                if (data.horse_costs) {
+                    populateHorseCosts(data.horse_costs);
+                }
+            } catch (error) {
+                console.error('月データ読み込みエラー:', error);
+            }
+        }
+        
+        // 食材アイテムをレンダリング
+        function renderFeedItems() {
+            const container = document.getElementById('feedContainer');
+            container.innerHTML = '';
+            
+            for (const [key, feed] of Object.entries(feedPrices)) {
+                const div = document.createElement('div');
+                div.className = 'feed-item';
+                div.innerHTML = `
+                    <div class="feed-item-header">${feed.name}</div>
+                    <div class="feed-item-row">
+                        <label>単価（¥/${feed.unit}）</label>
+                        <input type="number" class="feed-price" data-key="${key}" value="${feed.price}" step="0.01" onchange="updateFeedItem('${key}')" />
+                        <label>数量（${feed.unit}）</label>
+                        <input type="number" class="feed-qty" data-key="${key}" value="0" step="0.01" onchange="updateCommonTotal()" />
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+        }
+        
+        // 飼料アイテム更新
+        function updateFeedItem(key) {
+            const price = document.querySelector(`input.feed-price[data-key="${key}"]`).value;
+            feedPrices[key].price = parseFloat(price) || 0;
+            updateCommonTotal();
+        }
+        
+        // 全体合計更新
+        function updateCommonTotal() {
+            let total = 0;
+            
+            document.querySelectorAll('input.feed-qty').forEach(input => {
+                const key = input.dataset.key;
+                const price = feedPrices[key].price || 0;
+                const qty = parseFloat(input.value) || 0;
+                total += price * qty;
+            });
+            
+            // 敷料費
+            const beddingPrice = parseFloat(document.getElementById('bedding_price').value) || 0;
+            const beddingQty = parseFloat(document.getElementById('bedding_qty').value) || 0;
+            total += beddingPrice * beddingQty;
+            
+            document.getElementById('commonTotal').textContent = '¥' + total.toLocaleString();
+            updateTotalCost();
+        }
+        
+        // 馬別追加コスト追加
+        function addHorseCost() {
+            const container = document.getElementById('horseCostsContainer');
+            horseCostRows++;
+            
+            const div = document.createElement('div');
+            div.className = 'horse-cost-section';
+            div.id = `horse-cost-${horseCostRows}`;
+            div.innerHTML = `
+                <div class="horse-cost-header">
+                    <select class="horse-select" onchange="updateTotalCost()">
+                        <option value="">馬を選択</option>
+                        <option>グートアウス</option>
+                        <option>レストア</option>
+                        <option>ダーク</option>
+                        <option>ステップ</option>
+                        <option>ジュジュ</option>
+                        <option>ロアッソ</option>
+                        <option>カラス</option>
+                        <option>ミライ</option>
+                        <option>オディール</option>
+                        <option>メルモ</option>
+                        <option>ラピス</option>
+                        <option>マサゴロウ</option>
+                        <option>ジン</option>
+                        <option>シュン</option>
+                        <option>ララ</option>
+                        <option>ポテト</option>
+                        <option>マルコ</option>
+                        <option>ユメ</option>
+                    </select>
+                    <button class="horse-cost-remove" onclick="removeHorseCost(${horseCostRows})">削除</button>
+                </div>
+                
+                <h4 style="color: #667eea; margin-bottom: 10px;">💉 医療費</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ワクチン（¥）</label>
+                        <input type="number" class="vaccine-cost" value="0" onchange="updateTotalCost()" />
+                    </div>
+                    <div class="form-group">
+                        <label>装蹄（¥）</label>
+                        <input type="number" class="shoeing-cost" value="16500" onchange="updateShoeing(${horseCostRows})" />
+                    </div>
+                    <div class="form-group">
+                        <label>駆虫薬（¥）</label>
+                        <input type="number" class="worming-cost" value="0" onchange="updateTotalCost()" />
+                    </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="trim-${horseCostRows}" onchange="toggleTrimming(${horseCostRows})" />
+                    <label for="trim-${horseCostRows}">削蹄のみ</label>
+                </div>
+                
+                <div id="trimming-${horseCostRows}" style="display: none;">
+                    <div class="form-group">
+                        <label>削蹄のみ（¥）</label>
+                        <input type="number" class="trimming-cost" value="7000" onchange="updateTotalCost()" />
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>その他（¥）</label>
+                    <input type="number" class="other-cost" value="0" onchange="updateTotalCost()" />
+                </div>
+            `;
+            
+            container.appendChild(div);
+        }
+        
+        // 装蹄/削蹄切り替え
+        function toggleTrimming(id) {
+            const checkbox = document.getElementById(`trim-${id}`);
+            const shoeingInput = document.querySelector(`#horse-cost-${id} .shoeing-cost`);
+            const trimmingDiv = document.getElementById(`trimming-${id}`);
+            
+            if (checkbox.checked) {
+                shoeingInput.disabled = true;
+                shoeingInput.style.opacity = '0.5';
+                trimmingDiv.style.display = 'block';
+            } else {
+                shoeingInput.disabled = false;
+                shoeingInput.style.opacity = '1';
+                trimmingDiv.style.display = 'none';
+            }
+            
+            updateTotalCost();
+        }
+        
+        // 装蹄の更新
+        function updateShoeing(id) {
+            updateTotalCost();
+        }
+        
+        // 馬別コスト削除
+        function removeHorseCost(id) {
+            const element = document.getElementById(`horse-cost-${id}`);
+            if (element) {
+                element.remove();
+                updateTotalCost();
+            }
+        }
+        
+        // 全コスト更新
+        function updateTotalCost() {
+            let common = 0;
+            
+            // 共通費
+            document.querySelectorAll('input.feed-qty').forEach(input => {
+                const key = input.dataset.key;
+                const price = feedPrices[key].price || 0;
+                const qty = parseFloat(input.value) || 0;
+                common += price * qty;
+            });
+            
+            const beddingPrice = parseFloat(document.getElementById('bedding_price').value) || 0;
+            const beddingQty = parseFloat(document.getElementById('bedding_qty').value) || 0;
+            common += beddingPrice * beddingQty;
+            
+            // 馬別費
+            let horseTotal = 0;
+            document.querySelectorAll('.horse-cost-section').forEach(section => {
+                const vaccine = parseFloat(section.querySelector('.vaccine-cost').value) || 0;
+                const worming = parseFloat(section.querySelector('.worming-cost').value) || 0;
+                const other = parseFloat(section.querySelector('.other-cost').value) || 0;
+                
+                const isTrimming = section.querySelector('input[type="checkbox"]').checked;
+                let shoeing = 0;
+                
+                if (isTrimming) {
+                    shoeing = parseFloat(section.querySelector('.trimming-cost').value) || 0;
+                } else {
+                    shoeing = parseFloat(section.querySelector('.shoeing-cost').value) || 0;
+                }
+                
+                horseTotal += vaccine + shoeing + worming + other;
+            });
+            
+            const total = common + horseTotal;
+            document.getElementById('totalCost').textContent = '¥' + total.toLocaleString();
+        }
+        
+        // タブ切り替え
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // データ保存
+        async function saveMonthData() {
+            const monthInput = document.getElementById('monthInput');
+            const year = monthInput.valueAsDate.getFullYear();
+            const month = String(monthInput.valueAsDate.getMonth() + 1).padStart(2, '0');
+            
+            const commonCosts = {};
+            const horseCosts = {};
+            
+            // 共通費の集計
+            commonCosts.feed = {};
+            document.querySelectorAll('input.feed-qty').forEach(input => {
+                const key = input.dataset.key;
+                const feedName = feedPrices[key].name;
+                const price = feedPrices[key].price || 0;
+                const qty = parseFloat(input.value) || 0;
+                commonCosts.feed[feedName] = price * qty;
+            });
+            
+            commonCosts.bedding = {
+                'おがくず等': (parseFloat(document.getElementById('bedding_price').value) || 0) * 
+                              (parseFloat(document.getElementById('bedding_qty').value) || 0)
+            };
+            
+            // 馬別費の集計
+            document.querySelectorAll('.horse-cost-section').forEach(section => {
+                const horse = section.querySelector('.horse-select').value;
+                if (!horse) return;
+                
+                horseCosts[horse] = {
+                    vaccine: parseFloat(section.querySelector('.vaccine-cost').value) || 0,
+                    worming: parseFloat(section.querySelector('.worming-cost').value) || 0,
+                    other: parseFloat(section.querySelector('.other-cost').value) || 0
+                };
+                
+                const isTrimming = section.querySelector('input[type="checkbox"]').checked;
+                if (isTrimming) {
+                    horseCosts[horse].trimming = parseFloat(section.querySelector('.trimming-cost').value) || 0;
+                } else {
+                    horseCosts[horse].shoeing = parseFloat(section.querySelector('.shoeing-cost').value) || 0;
+                }
+            });
+            
+            const data = {
+                common_costs: commonCosts,
+                horse_costs: horseCosts,
+                feed_prices: feedPrices
+            };
+            
+            try {
+                const response = await fetch(`/api/save-month/${year}/${month}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('successMessage').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error('保存エラー:', error);
+                document.getElementById('errorMessage').textContent = '保存に失敗しました';
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+        
+        // レポート読み込み
+        async function loadReport() {
+            const year = document.getElementById('reportYear').value;
+            
+            try {
+                const response = await fetch(`/api/report/${year}`);
+                const data = await response.json();
+                
+                let html = '<div class="summary-box">';
+                html += '<h3>年間総コスト</h3>';
+                html += '<div class="amount">¥' + (data.total_cost || 0).toLocaleString() + '</div>';
+                html += '</div>';
+                
+                html += '<h4 style="margin-top: 20px;">月別コスト</h4>';
+                html += '<table style="width: 100%; border-collapse: collapse;">';
+                for (const [month, cost] of Object.entries(data.monthly_breakdown || {})) {
+                    html += `<tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 10px;">${month}</td>
+                        <td style="padding: 10px; text-align: right;">¥${(cost || 0).toLocaleString()}</td>
+                    </tr>`;
+                }
+                html += '</table>';
+                
+                document.getElementById('reportContent').innerHTML = html;
+            } catch (error) {
+                console.error('レポート取得エラー:', error);
+            }
+        }
+        
+        // パスワード変更
+        function changePassword() {
+            alert('パスワード変更機能は管理者に連絡してください');
+        }
+        
+        // データエクスポート
+        function exportData() {
+            alert('データエクスポート機能は準備中です');
+        }
+        
+        // その他の関数（プレースホルダー）
+        function populateCommonCosts(data) {
+            // 後で実装
+        }
+        
+        function populateHorseCosts(data) {
+            // 後で実装
+        }
+        
+        // Enter キーでログイン
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') {
+                handleLogin();
+            }
+        });
+    </script>
+</body>
+</html>
