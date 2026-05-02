@@ -474,7 +474,130 @@
                             <!-- 飼料費 -->
                             <div style="margin-bottom: 20px;">
                                 <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">🌾 飼料費</h4>
-                                <div id="feedContainer"></div>
+                                
+                                <!-- 牧草類（週ごと金額入力） -->
+                                <div class="feed-item">
+                                    <div class="feed-item-header">USアルファ1番刈</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>週1（¥）</label>
+                                            <input type="number" class="alfalfa-week" data-week="1" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>週2（¥）</label>
+                                            <input type="number" class="alfalfa-week" data-week="2" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>週3（¥）</label>
+                                            <input type="number" class="alfalfa-week" data-week="3" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>週4（¥）</label>
+                                            <input type="number" class="alfalfa-week" data-week="4" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="feed-item">
+                                    <div class="feed-item-header">USチモシープレ</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>週1（¥）</label>
+                                            <input type="number" class="timothy-week" data-week="1" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>週2（¥）</label>
+                                            <input type="number" class="timothy-week" data-week="2" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>週3（¥）</label>
+                                            <input type="number" class="timothy-week" data-week="3" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>週4（¥）</label>
+                                            <input type="number" class="timothy-week" data-week="4" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="feed-item">
+                                    <div class="feed-item-header">USライグラス・ストロー</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>週1（¥）</label>
+                                            <input type="number" class="ryegrass-week" data-week="1" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>週2（¥）</label>
+                                            <input type="number" class="ryegrass-week" data-week="2" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>週3（¥）</label>
+                                            <input type="number" class="ryegrass-week" data-week="3" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>週4（¥）</label>
+                                            <input type="number" class="ryegrass-week" data-week="4" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- その他の飼料 -->
+                                <div class="feed-item">
+                                    <div class="feed-item-header">ふすま 20kg</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>単価（¥/袋）</label>
+                                            <input type="number" id="bran_price" value="1460" step="0.01" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>数量（袋）</label>
+                                            <input type="number" id="bran_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="feed-item">
+                                    <div class="feed-item-header">リン酸カルシウム</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>単価（¥/kg）</label>
+                                            <input type="number" id="calcium_price" value="1000" step="0.01" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>数量（kg）</label>
+                                            <input type="number" id="calcium_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="feed-item">
+                                    <div class="feed-item-header">こめ油</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>単価（¥/kg）</label>
+                                            <input type="number" id="rice_oil_price" value="800" step="0.01" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>数量（kg）</label>
+                                            <input type="number" id="rice_oil_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="feed-item">
+                                    <div class="feed-item-header">塩</div>
+                                    <div class="feed-item-inputs">
+                                        <div class="form-group">
+                                            <label>単価（¥/kg）</label>
+                                            <input type="number" id="salt_price" value="500" step="0.01" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>数量（kg）</label>
+                                            <input type="number" id="salt_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <!-- 装蹄費 -->
@@ -644,18 +767,6 @@
             document.getElementById('loginError').style.display = 'none';
         }
         
-        // 飼料単価初期化
-        async function initializeFeedPrices() {
-            try {
-                const response = await fetch('/api/feed-prices');
-                const data = await response.json();
-                feedPrices = data.prices;
-                renderFeedItems();
-            } catch (error) {
-                console.error('飼料単価取得エラー:', error);
-            }
-        }
-        
         // 月データ読み込み
         async function loadMonthData() {
             const monthInput = document.getElementById('monthInput');
@@ -677,48 +788,39 @@
             }
         }
         
-        // 食材アイテムをレンダリング
-        function renderFeedItems() {
-            const container = document.getElementById('feedContainer');
-            container.innerHTML = '';
-            
-            for (const [key, feed] of Object.entries(feedPrices)) {
-                const div = document.createElement('div');
-                div.className = 'feed-item';
-                div.innerHTML = `
-                    <div class="feed-item-header">${feed.name}</div>
-                    <div class="feed-item-inputs">
-                        <div class="form-group">
-                            <label>単価（¥/${feed.unit}）</label>
-                            <input type="number" class="feed-price" data-key="${key}" value="${feed.price}" step="0.01" onchange="updateFeedItem('${key}')" />
-                        </div>
-                        <div class="form-group">
-                            <label>数量（${feed.unit}）</label>
-                            <input type="number" class="feed-qty" data-key="${key}" value="0" step="0.01" onchange="updateCommonTotal()" />
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-            }
-        }
-        
-        // 飼料アイテム更新
-        function updateFeedItem(key) {
-            const price = document.querySelector(`input.feed-price[data-key="${key}"]`).value;
-            feedPrices[key].price = parseFloat(price) || 0;
-            updateCommonTotal();
-        }
-        
         // 全体合計更新
         function updateCommonTotal() {
             let total = 0;
             
-            document.querySelectorAll('input.feed-qty').forEach(input => {
-                const key = input.dataset.key;
-                const price = feedPrices[key].price || 0;
-                const qty = parseFloat(input.value) || 0;
-                total += price * qty;
+            // 牧草類（週ごと金額入力）
+            document.querySelectorAll('.alfalfa-week').forEach(input => {
+                total += parseFloat(input.value) || 0;
             });
+            
+            document.querySelectorAll('.timothy-week').forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            
+            document.querySelectorAll('.ryegrass-week').forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            
+            // その他の飼料（単価 × 数量）
+            const branPrice = parseFloat(document.getElementById('bran_price').value) || 0;
+            const branQty = parseFloat(document.getElementById('bran_qty').value) || 0;
+            total += branPrice * branQty;
+            
+            const calciumPrice = parseFloat(document.getElementById('calcium_price').value) || 0;
+            const calciumQty = parseFloat(document.getElementById('calcium_qty').value) || 0;
+            total += calciumPrice * calciumQty;
+            
+            const riceOilPrice = parseFloat(document.getElementById('rice_oil_price').value) || 0;
+            const riceOilQty = parseFloat(document.getElementById('rice_oil_qty').value) || 0;
+            total += riceOilPrice * riceOilQty;
+            
+            const saltPrice = parseFloat(document.getElementById('salt_price').value) || 0;
+            const saltQty = parseFloat(document.getElementById('salt_qty').value) || 0;
+            total += saltPrice * saltQty;
             
             // ヘイキューブ
             const haycubePrice = parseFloat(document.getElementById('haycube_price').value) || 0;
@@ -937,13 +1039,32 @@
             
             // 共通費の集計
             commonCosts.feed = {};
-            document.querySelectorAll('input.feed-qty').forEach(input => {
-                const key = input.dataset.key;
-                const feedName = feedPrices[key].name;
-                const price = feedPrices[key].price || 0;
-                const qty = parseFloat(input.value) || 0;
-                commonCosts.feed[feedName] = price * qty;
+            
+            // 牧草類（週ごと金額）
+            commonCosts.feed['USアルファ1番刈'] = 0;
+            document.querySelectorAll('.alfalfa-week').forEach(input => {
+                commonCosts.feed['USアルファ1番刈'] += parseFloat(input.value) || 0;
             });
+            
+            commonCosts.feed['USチモシープレ'] = 0;
+            document.querySelectorAll('.timothy-week').forEach(input => {
+                commonCosts.feed['USチモシープレ'] += parseFloat(input.value) || 0;
+            });
+            
+            commonCosts.feed['USライグラス・ストロー'] = 0;
+            document.querySelectorAll('.ryegrass-week').forEach(input => {
+                commonCosts.feed['USライグラス・ストロー'] += parseFloat(input.value) || 0;
+            });
+            
+            // その他の飼料
+            commonCosts.feed['ふすま 20kg'] = (parseFloat(document.getElementById('bran_price').value) || 0) * 
+                                               (parseFloat(document.getElementById('bran_qty').value) || 0);
+            commonCosts.feed['リン酸カルシウム'] = (parseFloat(document.getElementById('calcium_price').value) || 0) * 
+                                                    (parseFloat(document.getElementById('calcium_qty').value) || 0);
+            commonCosts.feed['こめ油'] = (parseFloat(document.getElementById('rice_oil_price').value) || 0) * 
+                                         (parseFloat(document.getElementById('rice_oil_qty').value) || 0);
+            commonCosts.feed['塩'] = (parseFloat(document.getElementById('salt_price').value) || 0) * 
+                                    (parseFloat(document.getElementById('salt_qty').value) || 0);
             
             commonCosts.shoeing = {
                 'ヘイキューブ 30kg': (parseFloat(document.getElementById('haycube_price').value) || 0) * 
