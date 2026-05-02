@@ -600,48 +600,11 @@
                                 </div>
                             </div>
                             
-                            <!-- 装蹄費 -->
+                            <!-- その他飼料（自由記述） -->
                             <div style="margin-bottom: 20px;">
-                                <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">👣 装蹄費</h4>
-                                <div class="feed-item">
-                                    <div class="feed-item-header">ヘイキューブ 30kg</div>
-                                    <div class="feed-item-inputs">
-                                        <div class="form-group">
-                                            <label>単価（¥/袋）</label>
-                                            <input type="number" id="haycube_price" value="3970" step="0.01" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label>数量（袋）</label>
-                                            <input type="number" id="haycube_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="feed-item">
-                                    <div class="feed-item-header">皮つき圧ぺん麦 20kg</div>
-                                    <div class="feed-item-inputs">
-                                        <div class="form-group">
-                                            <label>単価（¥/袋）</label>
-                                            <input type="number" id="barley_price" value="1601" step="0.01" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label>数量（袋）</label>
-                                            <input type="number" id="barley_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="feed-item">
-                                    <div class="feed-item-header">ハイホス 20kg</div>
-                                    <div class="feed-item-inputs">
-                                        <div class="form-group">
-                                            <label>単価（¥/袋）</label>
-                                            <input type="number" id="high_horse_price" value="4540" step="0.01" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label>数量（袋）</label>
-                                            <input type="number" id="high_horse_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
-                                        </div>
-                                    </div>
-                                </div>
+                                <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">📝 その他飼料</h4>
+                                <div id="otherFeedContainer"></div>
+                                <button class="btn-primary" onclick="addOtherFeedRow()" style="margin-bottom: 20px; width: 100%;">+ 商品を追加</button>
                             </div>
                             
                             <!-- 医療費 -->
@@ -724,8 +687,47 @@
     </div>
     
     <script>
-        let feedPrices = {};
-        let horseCostRows = 0;
+        let otherFeedRowCount = 0;
+        
+        // その他飼料の行を追加
+        function addOtherFeedRow() {
+            otherFeedRowCount++;
+            const container = document.getElementById('otherFeedContainer');
+            
+            const row = document.createElement('div');
+            row.className = 'other-feed-row feed-item';
+            row.id = `other-feed-${otherFeedRowCount}`;
+            row.innerHTML = `
+                <div class="feed-item-inputs" style="grid-template-columns: 1fr 1fr 1fr auto; gap: 10px;">
+                    <div class="form-group">
+                        <label>商品名</label>
+                        <input type="text" class="other-name" placeholder="例：ニンジン" />
+                    </div>
+                    <div class="form-group">
+                        <label>単価（¥）</label>
+                        <input type="number" class="other-price" value="0" step="0.01" onchange="updateCommonTotal()" />
+                    </div>
+                    <div class="form-group">
+                        <label>数量</label>
+                        <input type="number" class="other-qty" value="0" step="0.01" onchange="updateCommonTotal()" />
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button style="padding: 8px 12px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 12px;" onclick="removeOtherFeedRow(${otherFeedRowCount})">削除</button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(row);
+        }
+        
+        // その他飼料の行を削除
+        function removeOtherFeedRow(id) {
+            const element = document.getElementById(`other-feed-${id}`);
+            if (element) {
+                element.remove();
+                updateCommonTotal();
+            }
+        }
         
         // 初期化
         document.addEventListener('DOMContentLoaded', function() {
@@ -805,7 +807,7 @@
                 total += parseFloat(input.value) || 0;
             });
             
-            // その他の飼料（単価 × 数量）
+            // 固定飼料（単価 × 数量）
             const branPrice = parseFloat(document.getElementById('bran_price').value) || 0;
             const branQty = parseFloat(document.getElementById('bran_qty').value) || 0;
             total += branPrice * branQty;
@@ -822,25 +824,12 @@
             const saltQty = parseFloat(document.getElementById('salt_qty').value) || 0;
             total += saltPrice * saltQty;
             
-            // ヘイキューブ
-            const haycubePrice = parseFloat(document.getElementById('haycube_price').value) || 0;
-            const haycubeQty = parseFloat(document.getElementById('haycube_qty').value) || 0;
-            total += haycubePrice * haycubeQty;
-            
-            // 皮つき圧ぺん麦
-            const barleyPrice = parseFloat(document.getElementById('barley_price').value) || 0;
-            const barleyQty = parseFloat(document.getElementById('barley_qty').value) || 0;
-            total += barleyPrice * barleyQty;
-            
-            // ハイホス
-            const high_horsePrice = parseFloat(document.getElementById('high_horse_price').value) || 0;
-            const high_horseQty = parseFloat(document.getElementById('high_horse_qty').value) || 0;
-            total += high_horsePrice * high_horseQty;
-            
-            // 敷料費
-            const beddingPrice = parseFloat(document.getElementById('bedding_price').value) || 0;
-            const beddingQty = parseFloat(document.getElementById('bedding_qty').value) || 0;
-            total += beddingPrice * beddingQty;
+            // その他飼料（自由記述欄）
+            document.querySelectorAll('.other-feed-row').forEach(row => {
+                const price = parseFloat(row.querySelector('.other-price').value) || 0;
+                const qty = parseFloat(row.querySelector('.other-qty').value) || 0;
+                total += price * qty;
+            });
             
             document.getElementById('commonTotal').textContent = '¥' + total.toLocaleString();
             updateTotalCost();
@@ -1056,7 +1045,7 @@
                 commonCosts.feed['USライグラス・ストロー'] += parseFloat(input.value) || 0;
             });
             
-            // その他の飼料
+            // 固定飼料
             commonCosts.feed['ふすま 20kg'] = (parseFloat(document.getElementById('bran_price').value) || 0) * 
                                                (parseFloat(document.getElementById('bran_qty').value) || 0);
             commonCosts.feed['リン酸カルシウム'] = (parseFloat(document.getElementById('calcium_price').value) || 0) * 
@@ -1066,14 +1055,13 @@
             commonCosts.feed['塩'] = (parseFloat(document.getElementById('salt_price').value) || 0) * 
                                     (parseFloat(document.getElementById('salt_qty').value) || 0);
             
-            commonCosts.shoeing = {
-                'ヘイキューブ 30kg': (parseFloat(document.getElementById('haycube_price').value) || 0) * 
-                                       (parseFloat(document.getElementById('haycube_qty').value) || 0),
-                '皮つき圧ぺん麦 20kg': (parseFloat(document.getElementById('barley_price').value) || 0) * 
-                                        (parseFloat(document.getElementById('barley_qty').value) || 0),
-                'ハイホス 20kg': (parseFloat(document.getElementById('high_horse_price').value) || 0) * 
-                                (parseFloat(document.getElementById('high_horse_qty').value) || 0)
-            };
+            // その他飼料（自由記述欄）
+            document.querySelectorAll('.other-feed-row').forEach(row => {
+                const name = row.querySelector('.other-name').value || '商品';
+                const price = parseFloat(row.querySelector('.other-price').value) || 0;
+                const qty = parseFloat(row.querySelector('.other-qty').value) || 0;
+                commonCosts.feed[name] = price * qty;
+            });
             
             commonCosts.bedding = {
                 'おがくず等': (parseFloat(document.getElementById('bedding_price').value) || 0) * 
