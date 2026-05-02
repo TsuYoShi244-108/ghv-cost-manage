@@ -607,28 +607,11 @@
                                 <button class="btn-primary" onclick="addOtherFeedRow()" style="margin-bottom: 20px; width: 100%;">+ 商品を追加</button>
                             </div>
                             
-                            <!-- 医療費 -->
-                            <div style="margin-bottom: 20px;">
-                                <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">💉 医療費</h4>
-                                <div style="color: #666; font-size: 13px; margin-bottom: 10px;">※個別の馬の医療費はステップ2で入力</div>
-                            </div>
-                            
                             <!-- 敷料費 -->
                             <div style="margin-bottom: 20px;">
                                 <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px;">📦 敷料費</h4>
-                                <div class="feed-item">
-                                    <div class="feed-item-header">おがくず等</div>
-                                    <div class="feed-item-inputs">
-                                        <div class="form-group">
-                                            <label>単価（¥/kg）</label>
-                                            <input type="number" id="bedding_price" value="0" step="0.01" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label>数量（kg）</label>
-                                            <input type="number" id="bedding_qty" value="0" step="0.01" onchange="updateCommonTotal()" />
-                                        </div>
-                                    </div>
-                                </div>
+                                <div id="beddingContainer"></div>
+                                <button class="btn-primary" onclick="addBeddingRow()" style="width: 100%; margin-bottom: 10px;">+ 購入を追加</button>
                             </div>
                             
                             <div class="summary-box">
@@ -675,7 +658,10 @@
             
             <!-- レポートタブ -->
             <div id="report" class="tab-content">
-                <h3>📊 年間レポート</h3>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <h3 style="margin: 0;">📊 年間レポート</h3>
+                    <button class="btn-primary" onclick="exportCSV()" style="flex: none; width: auto; padding: 10px 20px; background: #27ae60;">📥 CSV出力</button>
+                </div>
                 <div class="form-group">
                     <label>年を選択：</label>
                     <input type="number" id="reportYear" value="2026" min="2020" max="2030" />
@@ -688,6 +674,38 @@
     
     <script>
         let otherFeedRowCount = 0;
+        let beddingRowCount = 0;
+        let horseCostRows = 0;
+        
+        // 敷料費の行を追加
+        function addBeddingRow() {
+            beddingRowCount++;
+            const container = document.getElementById('beddingContainer');
+            
+            const row = document.createElement('div');
+            row.className = 'bedding-row feed-item';
+            row.id = `bedding-${beddingRowCount}`;
+            row.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: flex-end;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>購入日</label>
+                        <input type="date" class="bedding-date" />
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>金額（¥）</label>
+                        <input type="number" class="bedding-amount" value="0" step="1" onchange="updateCommonTotal()" />
+                    </div>
+                    <button style="padding: 8px 12px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; height: 38px;" onclick="removeBeddingRow(${beddingRowCount})">削除</button>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+        
+        // 敷料費の行を削除
+        function removeBeddingRow(id) {
+            const el = document.getElementById(`bedding-${id}`);
+            if (el) { el.remove(); updateCommonTotal(); }
+        }
         
         // その他飼料の行を追加
         function addOtherFeedRow() {
@@ -829,6 +847,11 @@
                 const price = parseFloat(row.querySelector('.other-price').value) || 0;
                 const qty = parseFloat(row.querySelector('.other-qty').value) || 0;
                 total += price * qty;
+            });
+            
+            // 敷料費（日付＋金額の行）
+            document.querySelectorAll('.bedding-amount').forEach(input => {
+                total += parseFloat(input.value) || 0;
             });
             
             document.getElementById('commonTotal').textContent = '¥' + total.toLocaleString();
@@ -1063,10 +1086,13 @@
                 commonCosts.feed[name] = price * qty;
             });
             
-            commonCosts.bedding = {
-                'おがくず等': (parseFloat(document.getElementById('bedding_price').value) || 0) * 
-                             (parseFloat(document.getElementById('bedding_qty').value) || 0)
-            };
+            // 敷料費（日付＋金額）
+            commonCosts.bedding = [];
+            document.querySelectorAll('.bedding-row').forEach(row => {
+                const date = row.querySelector('.bedding-date').value;
+                const amount = parseFloat(row.querySelector('.bedding-amount').value) || 0;
+                if (amount > 0) commonCosts.bedding.push({ date, amount });
+            });
             
             // 馬別費の集計
             document.querySelectorAll('.horse-cost-section').forEach(section => {
@@ -1124,19 +1150,46 @@
                 html += '<div class="amount">¥' + (data.total_cost || 0).toLocaleString() + '</div>';
                 html += '</div>';
                 
-                html += '<h4 style="margin-top: 20px;">月別コスト</h4>';
-                html += '<table style="width: 100%; border-collapse: collapse;">';
+                html += '<h4 style="margin-top: 20px; margin-bottom: 10px;">月別コスト</h4>';
+                html += '<table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">';
+                html += '<thead><tr style="background: #667eea; color: white;"><th style="padding: 12px; text-align: left;">月</th><th style="padding: 12px; text-align: right;">コスト</th></tr></thead><tbody>';
                 for (const [month, cost] of Object.entries(data.monthly_breakdown || {})) {
-                    html += `<tr style="border-bottom: 1px solid #ddd;">
-                        <td style="padding: 10px;">${month}</td>
-                        <td style="padding: 10px; text-align: right;">¥${(cost || 0).toLocaleString()}</td>
+                    html += `<tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 12px;">${month}</td>
+                        <td style="padding: 12px; text-align: right;">¥${(cost || 0).toLocaleString()}</td>
                     </tr>`;
                 }
-                html += '</table>';
+                html += '</tbody></table>';
                 
                 document.getElementById('reportContent').innerHTML = html;
             } catch (error) {
                 console.error('レポート取得エラー:', error);
+            }
+        }
+        
+        // CSV出力
+        async function exportCSV() {
+            const year = document.getElementById('reportYear').value;
+            
+            try {
+                const response = await fetch(`/api/report/${year}`);
+                const data = await response.json();
+                
+                let csv = '\uFEFF月,コスト\n';
+                for (const [month, cost] of Object.entries(data.monthly_breakdown || {})) {
+                    csv += `${year}年${month},${cost || 0}\n`;
+                }
+                csv += `年間合計,${data.total_cost || 0}\n`;
+                
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `GHVコスト_${year}年.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('CSV出力エラー:', error);
             }
         }
         
