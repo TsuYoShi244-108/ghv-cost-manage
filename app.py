@@ -1,10 +1,21 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import json
 import os
 import psycopg2
 import psycopg2.extras
 from datetime import datetime
+import base64
+import io
+import re
+import anthropic
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+
+pdfmetrics.registerFont(UnicodeCIDFont('HeiseiKakuGo-W5'))
 
 app = Flask(__name__)
 CORS(app)
@@ -222,6 +233,149 @@ def get_year_report(year):
         report['total_cost'] += month_total
 
     return jsonify(report)
+
+
+@app.route('/api/receipt/analyze', methods=['POST'])
+def analyze_receipt():
+    if 'image' not in request.files:
+        return jsonify({'error': '画像ファイルが必要です'}), 400
+
+    file = request.files['image']
+    image_data = file.read()
+    base64_image = base64.b64encode(image_data).decode('utf-8')
+
+    content_type = file.content_type or 'image/jpeg'
+    if content_type not in ('image/jpeg', 'image/png', 'image/gif', 'image/webp'):
+        content_type = 'image/jpeg'
+
+    api_key = os.environ.get('ANTHROPIC_API_KEY')
+    if not api_key:
+        return jsonify({'error': 'ANTHROPIC_API_KEY が設定されていません'}), 500
+
+    client = anthropic.Anthropic(api_key=api_key)
+
+    message = client.messages.create(
+        model='claude-haiku-4-5-20251001',
+        max_tokens=512,
+        messages=[
+            {
+                'role': 'user',
+                'content': [
+                    {
+                        'type': 'image',
+                        'source': {
+                            'type': 'base64',
+                            'media_type': content_type,
+                            'data': base64_image,
+                        },
+                    },
+                    {
+                        'type': 'text',
+                        'text': (
+                            'このレシート画像から以下の情報を読み取り、必ずJSON形式だけで返してください。'
+                            '余分なテキストは一切含めないでください。\n'
+                            '{\n'
+                            '  "timestamp": "日付と時刻（例: 2024年1月15日 14:30）",\n'
+                            '  "amount": "合計金額（数字のみ、例: 1250）",\n'
+                            '  "company": "企業名・会社名",\n'
+                            '  "store": "店舗名・支店名"\n'
+                            '}\n'
+                            '読み取れないフィールドは空文字列にしてください。'
+                        ),
+                    },
+                ],
+            }
+        ],
+    )
+
+    response_text = message.content[0].text.strip()
+    json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+    if json_match:
+        try:
+            data = json.loads(json_match.group())
+        except json.JSONDecodeError:
+            data = {'timestamp': '', 'amount': '', 'company': '', 'store': ''}
+    else:
+        data = {'timestamp': '', 'amount': '', 'company': '', 'store': ''}
+
+    return jsonify(data)
+
+
+@app.route('/api/receipt/pdf', methods=['POST'])
+def generate_receipt_pdf():
+    data = request.json or {}
+    timestamp = data.get('timestamp', '')
+    amount = data.get('amount', '')
+    company = data.get('company', '')
+    store = data.get('store', '')
+
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    font = 'HeiseiKakuGo-W5'
+
+    # ヘッダー背景
+    c.setFillColor(colors.HexColor('#2c3e50'))
+    c.rect(0, height - 100, width, 100, fill=1, stroke=0)
+
+    c.setFillColor(colors.white)
+    c.setFont(font, 22)
+    c.drawString(50, height - 55, 'レシート情報')
+    c.setFont(font, 11)
+    c.drawString(50, height - 80, '読み取り結果')
+
+    # 区切り線
+    c.setStrokeColor(colors.HexColor('#ecf0f1'))
+    c.setLineWidth(1)
+    c.line(50, height - 120, width - 50, height - 120)
+
+    fields = [
+        ('日時', timestamp or '（不明）'),
+        ('企業名', company or '（不明）'),
+        ('店舗名', store or '（不明）'),
+        ('金額', f'¥{int(amount):,}' if amount and str(amount).isdigit() else (f'¥{amount}' if amount else '（不明）')),
+    ]
+
+    label_x = 60
+    value_x = 180
+    y = height - 165
+    row_height = 60
+
+    for label, value in fields:
+        # 行背景
+        c.setFillColor(colors.HexColor('#f8f9fa'))
+        c.rect(40, y - 12, width - 80, 44, fill=1, stroke=0)
+        c.setStrokeColor(colors.HexColor('#dee2e6'))
+        c.setLineWidth(0.5)
+        c.rect(40, y - 12, width - 80, 44, fill=0, stroke=1)
+
+        c.setFillColor(colors.HexColor('#6c757d'))
+        c.setFont(font, 10)
+        c.drawString(label_x, y + 18, label)
+
+        c.setFillColor(colors.HexColor('#212529'))
+        c.setFont(font, 14)
+        c.drawString(value_x, y + 15, value)
+
+        y -= row_height
+
+    # フッター
+    c.setFillColor(colors.HexColor('#f8f9fa'))
+    c.rect(0, 0, width, 40, fill=1, stroke=0)
+    c.setFillColor(colors.HexColor('#adb5bd'))
+    c.setFont(font, 9)
+    generated_at = datetime.now().strftime('%Y年%m月%d日 %H:%M')
+    c.drawString(50, 14, f'作成日時: {generated_at}')
+
+    c.save()
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name='receipt.pdf',
+        mimetype='application/pdf',
+    )
 
 
 if __name__ == '__main__':

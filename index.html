@@ -10,6 +10,11 @@
             padding: 0;
             box-sizing: border-box;
         }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -453,6 +458,7 @@
             <div class="tabs">
                 <button class="tab-button active" onclick="switchTab('input')">💰 入力</button>
                 <button class="tab-button" onclick="switchTab('report')">📊 レポート</button>
+                <button class="tab-button" onclick="switchTab('receipt')">📷 レシート</button>
             </div>
             
             <!-- 入力タブ -->
@@ -668,6 +674,79 @@
                     <button class="btn-primary" onclick="loadReport()" style="margin-top: 10px;">レポートを生成</button>
                 </div>
                 <div id="reportContent" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- レシートタブ -->
+            <div id="receipt" class="tab-content">
+                <div style="max-width: 720px; margin: 0 auto; padding: 10px 0;">
+                    <h2 style="color: #2c3e50; margin-bottom: 6px; font-size: 22px;">📷 レシート読み取り</h2>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 24px;">レシート画像をアップロードすると、タイムスタンプ・金額・企業名・店舗名を自動抽出してPDFに変換します。</p>
+
+                    <!-- ドロップゾーン -->
+                    <div id="receiptDropZone"
+                         onclick="document.getElementById('receiptFileInput').click()"
+                         ondragover="event.preventDefault(); this.style.borderColor='#667eea'; this.style.background='#f0f2ff';"
+                         ondragleave="this.style.borderColor='#ccc'; this.style.background='#fafafa';"
+                         ondrop="handleReceiptDrop(event)"
+                         style="border: 2px dashed #ccc; border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; background: #fafafa; transition: all 0.2s; margin-bottom: 20px;">
+                        <input type="file" id="receiptFileInput" accept="image/*" style="display:none" onchange="handleReceiptFileSelect(this)">
+                        <div id="receiptUploadPrompt">
+                            <div style="font-size: 48px; margin-bottom: 12px;">📄</div>
+                            <div style="font-size: 16px; color: #555; font-weight: bold; margin-bottom: 6px;">ここにレシート画像をドロップ</div>
+                            <div style="font-size: 13px; color: #999;">またはクリックしてファイルを選択（JPG・PNG・GIF・WebP）</div>
+                        </div>
+                        <img id="receiptImagePreview" style="display:none; max-width:100%; max-height:380px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                    </div>
+
+                    <!-- 読み取りボタン -->
+                    <button id="receiptAnalyzeBtn"
+                            onclick="analyzeReceipt()"
+                            style="width:100%; padding:14px; font-size:16px; background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; margin-bottom:20px;">
+                        🔍 読み取る
+                    </button>
+
+                    <!-- ローディング -->
+                    <div id="receiptLoading" style="display:none; text-align:center; padding:30px; color:#667eea;">
+                        <div style="font-size:32px; animation:spin 1s linear infinite; display:inline-block;">⏳</div>
+                        <div style="margin-top:10px; font-size:15px;">AIが読み取り中...</div>
+                    </div>
+
+                    <!-- エラー -->
+                    <div id="receiptError" style="display:none; background:#ffeef0; border:1px solid #f5a0a8; border-radius:8px; padding:14px; color:#c0392b; margin-bottom:16px;"></div>
+
+                    <!-- 読み取り結果 -->
+                    <div id="receiptResults" style="display:none;">
+                        <h3 style="color:#2c3e50; margin-bottom:16px; font-size:17px; border-bottom:2px solid #667eea; padding-bottom:8px;">✅ 読み取り結果（編集可）</h3>
+
+                        <div style="display:grid; gap:14px; margin-bottom:24px;">
+                            <div style="display:grid; grid-template-columns:100px 1fr; align-items:center; gap:10px;">
+                                <label style="font-weight:bold; color:#555; font-size:14px;">日時</label>
+                                <input type="text" id="resTimestamp" placeholder="例: 2024年1月15日 14:30"
+                                       style="padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; width:100%;">
+                            </div>
+                            <div style="display:grid; grid-template-columns:100px 1fr; align-items:center; gap:10px;">
+                                <label style="font-weight:bold; color:#555; font-size:14px;">企業名</label>
+                                <input type="text" id="resCompany" placeholder="例: 株式会社〇〇"
+                                       style="padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; width:100%;">
+                            </div>
+                            <div style="display:grid; grid-template-columns:100px 1fr; align-items:center; gap:10px;">
+                                <label style="font-weight:bold; color:#555; font-size:14px;">店舗名</label>
+                                <input type="text" id="resStore" placeholder="例: 渋谷店"
+                                       style="padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; width:100%;">
+                            </div>
+                            <div style="display:grid; grid-template-columns:100px 1fr; align-items:center; gap:10px;">
+                                <label style="font-weight:bold; color:#555; font-size:14px;">金額</label>
+                                <input type="text" id="resAmount" placeholder="例: 1250"
+                                       style="padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; width:100%;">
+                            </div>
+                        </div>
+
+                        <button onclick="downloadReceiptPdf()"
+                                style="width:100%; padding:14px; font-size:16px; background:#27ae60; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">
+                            📄 PDFダウンロード
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1208,6 +1287,106 @@
                 handleLogin();
             }
         });
+
+        // ---- レシート機能 ----
+
+        function handleReceiptFileSelect(input) {
+            if (input.files && input.files[0]) {
+                loadReceiptImage(input.files[0]);
+            }
+        }
+
+        function handleReceiptDrop(event) {
+            event.preventDefault();
+            const dropZone = document.getElementById('receiptDropZone');
+            dropZone.style.borderColor = '#ccc';
+            dropZone.style.background = '#fafafa';
+            const file = event.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadReceiptImage(file);
+            }
+        }
+
+        function loadReceiptImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('receiptImagePreview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                document.getElementById('receiptUploadPrompt').style.display = 'none';
+                document.getElementById('receiptResults').style.display = 'none';
+                document.getElementById('receiptError').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function analyzeReceipt() {
+            const fileInput = document.getElementById('receiptFileInput');
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('レシート画像を選択してください');
+                return;
+            }
+
+            document.getElementById('receiptLoading').style.display = 'block';
+            document.getElementById('receiptResults').style.display = 'none';
+            document.getElementById('receiptError').style.display = 'none';
+            document.getElementById('receiptAnalyzeBtn').disabled = true;
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+
+            try {
+                const res = await fetch('/api/receipt/analyze', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || '読み取りに失敗しました');
+                }
+
+                document.getElementById('resTimestamp').value = data.timestamp || '';
+                document.getElementById('resCompany').value = data.company || '';
+                document.getElementById('resStore').value = data.store || '';
+                document.getElementById('resAmount').value = data.amount || '';
+
+                document.getElementById('receiptResults').style.display = 'block';
+            } catch (err) {
+                const errorDiv = document.getElementById('receiptError');
+                errorDiv.textContent = 'エラー: ' + err.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                document.getElementById('receiptLoading').style.display = 'none';
+                document.getElementById('receiptAnalyzeBtn').disabled = false;
+            }
+        }
+
+        async function downloadReceiptPdf() {
+            const payload = {
+                timestamp: document.getElementById('resTimestamp').value,
+                company: document.getElementById('resCompany').value,
+                store: document.getElementById('resStore').value,
+                amount: document.getElementById('resAmount').value,
+            };
+
+            try {
+                const res = await fetch('/api/receipt/pdf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!res.ok) throw new Error('PDF生成に失敗しました');
+
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'receipt.pdf';
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                alert('エラー: ' + err.message);
+            }
+        }
     </script>
 </body>
 </html>
